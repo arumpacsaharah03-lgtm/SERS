@@ -1,1 +1,12 @@
+.env
+.venv/
+venv/
+**/venv/
+**/*.sqlite3
+**/__pycache__/
+**/*.py[cod]
+**/media/
+**/staticfiles/
+node_modules/
+.next/
 

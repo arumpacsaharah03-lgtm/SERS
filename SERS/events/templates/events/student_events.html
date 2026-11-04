@@ -1,0 +1,51 @@
+{% extends "events/base.html" %}
+{% block title %}Upcoming events — SERS{% endblock %}
+{% block content %}
+<header class="page-heading">
+  <span class="eyebrow">CAMPUS CALENDAR</span>
+  <h1>Upcoming events</h1>
+  <p>Discover events and register to reserve your place.</p>
+</header>
+<form class="filter-panel row g-2 align-items-center mb-4" method="get">
+  <div class="col-lg">
+    <label class="visually-hidden" for="event-search">Search events</label>
+    <div class="input-group"><span class="input-group-text"><i class="bi bi-search"></i></span><input id="event-search" class="form-control" type="search" name="search" value="{{ search }}" placeholder="Search title, description, or venue"></div>
+  </div>
+  <div class="col-lg-3">
+    <label class="visually-hidden" for="event-category">Category</label>
+    <select id="event-category" class="form-select" name="category">
+      <option value="">All categories</option>
+      {% for value, label in categories %}<option value="{{ value }}" {% if selected_category == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="col-lg-auto"><button class="btn btn-primary w-100" type="submit">Filter events</button></div>
+</form>
+<div class="row g-4">
+  {% for event in events %}
+    <div class="col-md-6 col-xl-4">
+      <article class="event-card h-100">
+        <div class="event-banner"><span class="event-category">{{ event.get_category_display }}</span><i class="bi bi-calendar2-event"></i></div>
+        <div class="event-content">
+          <h2>{{ event.title }}</h2>
+          <p class="event-detail"><i class="bi bi-calendar3"></i>{{ event.event_date|date:"M j, Y" }} · {{ event.start_time|time:"g:i A" }}–{{ event.end_time|time:"g:i A" }}</p>
+          <p class="event-detail"><i class="bi bi-geo-alt"></i>{{ event.venue }}</p>
+          <p class="event-description">{{ event.description }}</p>
+          <div class="event-facts"><span>Registration deadline<strong>{{ event.registration_deadline|date:"M j, Y, g:i A" }}</strong></span><span>Capacity<strong>{{ event.registration_count }} / {{ event.maximum_participants }}</strong></span></div>
+          {% if event.id in registered_event_ids %}
+            <button class="btn btn-outline-success w-100" disabled><i class="bi bi-check2 me-1"></i>Already registered</button>
+          {% elif event.registration_count >= event.maximum_participants %}
+            <button class="btn btn-outline-secondary w-100" disabled>Event full</button>
+          {% else %}
+            <form method="post" action="{% url 'student-register' event.id %}">
+              {% csrf_token %}
+              <button class="btn btn-primary w-100" type="submit">Register now <i class="bi bi-arrow-right ms-1"></i></button>
+            </form>
+          {% endif %}
+        </div>
+      </article>
+    </div>
+  {% empty %}
+    <div class="col-12"><div class="empty-state"><i class="bi bi-calendar2-x"></i><h2>No events found</h2><p>Try changing your search or check back later.</p></div></div>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends "events/base.html" %}
+{% block title %}Create student account — SERS{% endblock %}
+{% block main_class %}auth-layout{% endblock %}
+{% block content %}
+<div class="auth-frame signup-frame">
+  <section class="auth-intro">
+    <a class="navbar-brand d-inline-flex align-items-center gap-2 text-white" href="{% url 'home' %}">
+      <span class="brand-mark"><i class="bi bi-mortarboard-fill"></i></span>
+      <span><strong>SERS</strong><small class="brand-caption d-block">School Event Registration</small></span>
+    </a>
+    <div class="auth-copy">
+      <span class="eyebrow text-white-50">STUDENT PORTAL</span>
+      <h1>Be part of every<br>campus moment.</h1>
+      <p>Create your student account to discover events, register, and track approvals.</p>
+    </div>
+    <div class="auth-footnote"><i class="bi bi-calendar2-check me-2"></i>One account for your campus events.</div>
+  </section>
+  <section class="auth-panel">
+    <div class="auth-form auth-form-wide">
+      <span class="eyebrow">CREATE ACCOUNT</span>
+      <h2>Student registration</h2>
+      <p class="text-secondary mb-4">Enter your official student information and school-issued ID.</p>
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>
+      {% endif %}
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="row">
+          {% for field in form %}
+            {% if field.name == "first_name" or field.name == "middle_name" or field.name == "last_name" %}
+              <div class="col-md-4 mb-3">
+            {% else %}
+              <div class="col-md-6 mb-3">
+            {% endif %}
+              <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+              {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+              {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+            </div>
+          {% endfor %}
+        </div>
+        <button class="btn btn-primary w-100 mt-2" type="submit">Create student account <i class="bi bi-arrow-right ms-2"></i></button>
+      </form>
+      <p class="auth-switch">Already registered? <a href="{% url 'student-login' %}">Sign in</a></p>
+    </div>
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}
+{{ programs|json_script:"program-data" }}
+<script>
+  const departmentSelect = document.getElementById("id_department");
+  const programSelect = document.getElementById("id_program");
+  const programRows = JSON.parse(document.getElementById("program-data").textContent);
+  const selectedProgram = "{{ form.program.value|default_if_none:''|escapejs }}";
+  function filterPrograms() {
+    const departmentId = departmentSelect.value;
+    for (const option of programSelect.options) {
+      if (!option.value) continue;
+      const program = programRows.find((item) => String(item.id) === option.value);
+      const visible = program && String(program.department_id) === departmentId;
+      option.hidden = !visible;
+      if (!visible && option.selected) option.selected = false;
+    }
+    if (selectedProgram && !programSelect.value) {
+      const option = Array.from(programSelect.options).find((item) => item.value === selectedProgram);
+      if (option && !option.hidden) option.selected = true;
+    }
+    programSelect.disabled = !departmentId;
+  }
+  departmentSelect.addEventListener("change", filterPrograms);
+  filterPrograms();
+</script>
+{% endblock %}

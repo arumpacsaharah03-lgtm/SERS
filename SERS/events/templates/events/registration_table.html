@@ -1,0 +1,17 @@
+<div class="table-responsive data-card">
+  <table class="table align-middle mb-0">
+    <thead><tr><th>Event</th><th>Event date</th><th>Registered on</th><th>Status</th></tr></thead>
+    <tbody>
+      {% for registration in registrations %}
+        <tr>
+          <td><strong>{{ registration.event.title }}</strong><small class="d-block text-secondary">{{ registration.event.get_category_display }}</small></td>
+          <td>{{ registration.event.event_date|date:"M j, Y" }}</td>
+          <td>{{ registration.created_at|date:"M j, Y" }}</td>
+          <td><span class="badge rounded-pill text-bg-{% if registration.status == 'Approved' %}success{% elif registration.status == 'Rejected' %}danger{% else %}warning{% endif %}">{{ registration.get_status_display }}</span></td>
+        </tr>
+      {% empty %}
+        <tr><td class="text-center text-secondary py-4" colspan="4">You haven’t registered for any events yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

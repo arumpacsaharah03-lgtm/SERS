@@ -1,0 +1,45 @@
+{% extends "events/base.html" %}
+{% block title %}Student sign in — SERS{% endblock %}
+{% block main_class %}auth-layout{% endblock %}
+{% block content %}
+<div class="auth-frame">
+  <section class="auth-intro">
+    <a class="navbar-brand d-inline-flex align-items-center gap-2 text-white" href="{% url 'home' %}">
+      <span class="brand-mark"><i class="bi bi-mortarboard-fill"></i></span>
+      <span><strong>SERS</strong><small class="brand-caption d-block">School Event Registration</small></span>
+    </a>
+    <div class="auth-copy">
+      <span class="eyebrow text-white-50">STUDENT PORTAL</span>
+      <h1>Your campus,<br>your experiences.</h1>
+      <p>Discover school events, reserve your place, and keep every registration organized in one place.</p>
+    </div>
+    <div class="auth-footnote"><i class="bi bi-calendar2-check me-2"></i>Stay connected to campus life.</div>
+  </section>
+  <section class="auth-panel">
+    <div class="auth-form">
+      <span class="eyebrow">WELCOME BACK</span>
+      <h2>Sign in to SERS</h2>
+      <p class="text-secondary mb-4">Use your institutional student account to continue.</p>
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>
+      {% endif %}
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label" for="{{ form.email.id_for_label }}">Institutional email</label>
+          {{ form.email }}
+          {% for error in form.email.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+        </div>
+        <div class="mb-4">
+          <label class="form-label" for="{{ form.password.id_for_label }}">Password</label>
+          {{ form.password }}
+          {% for error in form.password.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+        </div>
+        <button class="btn btn-primary w-100" type="submit">Sign in <i class="bi bi-arrow-right ms-2"></i></button>
+      </form>
+      <p class="auth-switch">New to SERS? <a href="{% url 'student-signup' %}">Create a student account</a></p>
+      <div class="admin-link"><i class="bi bi-shield-lock me-2"></i>Administrator? <a href="{% url 'admin:login' %}">Open admin sign in</a></div>
+    </div>
+  </section>
+</div>
+{% endblock %}

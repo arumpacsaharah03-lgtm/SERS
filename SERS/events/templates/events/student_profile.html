@@ -1,0 +1,23 @@
+{% extends "events/base.html" %}
+{% block title %}My profile — SERS{% endblock %}
+{% block content %}
+<header class="page-heading">
+  <span class="eyebrow">STUDENT PORTAL</span>
+  <h1>My profile</h1>
+  <p>Your student account information.</p>
+</header>
+<section class="profile-card">
+  <div class="profile-avatar">{{ student.user.first_name|first }}{{ student.user.last_name|first }}</div>
+  <div>
+    <h2>{{ student.full_name }}</h2>
+    <p class="text-secondary mb-0">{{ student.user.email }}</p>
+  </div>
+  <dl class="profile-details">
+    <div><dt>Student ID</dt><dd>{{ student.student_id }}</dd></div>
+    <div><dt>Department</dt><dd>{{ student.department.name }}</dd></div>
+    <div><dt>Program</dt><dd>{{ student.program.name }}</dd></div>
+    <div><dt>Year level</dt><dd>{{ student.get_year_level_display }}</dd></div>
+  </dl>
+  <p class="form-text mb-0">For profile corrections, contact your school administrator.</p>
+</section>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "events/base.html" %}
+{% block title %}My registrations — SERS{% endblock %}
+{% block content %}
+<header class="page-heading">
+  <span class="eyebrow">MY ACTIVITY</span>
+  <h1>My registrations</h1>
+  <p>See your event requests and their latest approval status.</p>
+</header>
+{% include "events/registration_table.html" with registrations=registrations %}
+{% endblock %}

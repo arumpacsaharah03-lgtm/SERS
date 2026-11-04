@@ -1,0 +1,123 @@
+{% extends "admin/base_site.html" %}
+{% load i18n sers_admin %}
+
+{% block coltype %}colMS{% endblock %}
+{% block bodyclass %}{{ block.super }} sers-admin-dashboard{% endblock %}
+{% block nav-breadcrumbs %}{% endblock %}
+
+{% block content %}
+{% portal_stats user as dashboard_stats %}
+{% portal_shortcuts user as dashboard_shortcuts %}
+<div class="sers-dashboard">
+  <section class="sers-welcome">
+    <div>
+      <span class="sers-eyebrow">{% translate "SCHOOL EVENT REGISTRATION SYSTEM" %}</span>
+      <h1>{% translate "Administration portal" %}</h1>
+      <p>{% translate "Manage campus events, student records, and registration requests from one place." %}</p>
+    </div>
+    <a class="sers-primary-action" href="{% url 'admin:events_event_add' %}">
+      <i class="bi bi-plus-lg" aria-hidden="true"></i>
+      {% translate "Create event" %}
+    </a>
+  </section>
+
+  <section class="sers-stat-grid" aria-label="{% translate 'System overview' %}">
+    {% for stat in dashboard_stats %}
+      <a class="sers-stat-card" href="{{ stat.url }}">
+        <span class="sers-stat-icon {{ stat.tone }}"><i class="bi {{ stat.icon }}" aria-hidden="true"></i></span>
+        <span class="sers-stat-copy"><span>{{ stat.label }}</span><strong>{{ stat.value }}</strong></span>
+        <i class="bi bi-arrow-up-right sers-stat-arrow" aria-hidden="true"></i>
+      </a>
+    {% endfor %}
+  </section>
+
+  <div class="sers-dashboard-columns">
+    <section class="sers-panel sers-app-panel">
+      <div class="sers-panel-heading">
+        <div>
+          <h2>{% translate "Manage your system" %}</h2>
+          <p>{% translate "Open a section to view and manage its records." %}</p>
+        </div>
+      </div>
+      {% if app_list %}
+        <div class="sers-app-groups">
+          {% for app in app_list %}
+            <section class="sers-app-group">
+              <h3>{{ app.name }}</h3>
+              <div class="sers-model-grid">
+                {% for model in app.models %}
+                  <a class="sers-model-link" href="{{ model.admin_url }}">
+                    <span class="sers-model-icon"><i class="bi bi-grid-1x2" aria-hidden="true"></i></span>
+                    <span><strong>{{ model.name }}</strong><small>{% if model.add_url %}{% translate "View and add records" %}{% else %}{% translate "View records" %}{% endif %}</small></span>
+                    <i class="bi bi-chevron-right" aria-hidden="true"></i>
+                  </a>
+                {% endfor %}
+              </div>
+            </section>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="sers-empty">{% translate "You do not have permission to manage any records." %}</p>
+      {% endif %}
+    </section>
+
+    <aside class="sers-dashboard-side">
+      <section class="sers-panel">
+        <div class="sers-panel-heading">
+          <div>
+            <h2>{% translate "Quick actions" %}</h2>
+            <p>{% translate "Common administration tasks." %}</p>
+          </div>
+        </div>
+        <div class="sers-quick-actions">
+          {% for shortcut in dashboard_shortcuts %}
+            <a class="sers-quick-link" href="{{ shortcut.url }}">
+              <span class="sers-quick-icon"><i class="bi {{ shortcut.icon }}" aria-hidden="true"></i></span>
+              <span><strong>{{ shortcut.label }}</strong><small>{{ shortcut.description }}</small></span>
+              <i class="bi bi-arrow-up-right sers-quick-arrow" aria-hidden="true"></i>
+            </a>
+          {% endfor %}
+        </div>
+      </section>
+
+      <section class="sers-admin-note">
+        <span class="sers-note-icon"><i class="bi bi-shield-check" aria-hidden="true"></i></span>
+        <h2>{% translate "Administration workspace" %}</h2>
+        <p>{% translate "Changes made here are saved to the SERS database and reflected in the student portal." %}</p>
+      </section>
+
+      {% if user.is_active and user.is_staff %}
+        <section class="sers-panel sers-recent-panel">
+          <div class="sers-panel-heading">
+            <div>
+              <h2>{% translate "Recent actions" %}</h2>
+              <p>{% translate "Your latest changes." %}</p>
+            </div>
+          </div>
+          {% load log %}
+          {% get_admin_log 5 as admin_log for_user user %}
+          {% if admin_log %}
+            <ul class="sers-action-list">
+              {% for entry in admin_log %}
+                <li>
+                  <span class="sers-action-dot {% if entry.is_addition %}is-add{% elif entry.is_deletion %}is-delete{% endif %}"></span>
+                  <span>
+                    {% if entry.is_deletion or not entry.get_admin_url %}
+                      <strong>{{ entry.object_repr }}</strong>
+                    {% else %}
+                      <a href="{{ entry.get_admin_url }}"><strong>{{ entry.object_repr }}</strong></a>
+                    {% endif %}
+                    <small>{% if entry.content_type %}{{ entry.content_type.name|capfirst }}{% else %}{% translate "Record" %}{% endif %}</small>
+                  </span>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="sers-empty">{% translate "Your recent changes will appear here." %}</p>
+          {% endif %}
+        </section>
+      {% endif %}
+    </aside>
+  </div>
+</div>
+{% endblock %}
